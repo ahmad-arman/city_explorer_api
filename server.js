@@ -32,10 +32,10 @@ function Location (getData) {
 server.get ('/weather',(req, res) =>{
   let getData =require('./data/weather.json');
   let somData = getData.data;
-  let array = [];
-  somData.forEach(element => {
+
+  let array=  somData.map(element => {
     let weatherDay = new Weather (element);
-    array.push(weatherDay);
+    return weatherDay;
   });
 
   res.send(array);
