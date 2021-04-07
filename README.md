@@ -3,10 +3,10 @@
 #  city_explorer_api
 
 **Author**: Ahmad Arman
-**Version**: 1.0.0 
+**Version**: 2.0.0 
 
 ## Overview
-program show the location for Lynnwood and description weather for five day with date .
+program show the any location for any city and  weather and all parks for five day with date .
 
 ## Getting Started
 can user copy this link to show location 
@@ -23,20 +23,24 @@ we use of groub command as like that :
  npm start
  nodmon
  cors
+ superagent
+
  
 ## Change Log
-4/4/2021 6:00pm - Application now has a fully-functional express server,with a GET route for the location resource.
+5/4/2021 6:00pm - Application now has a fully-functional express server,with a GET route for the location resource.
 
 
 
 
 
-Number and name of feature: ________________________________
 
-Estimate of time needed to complete: ___3__
+
+Number and name of feature: ___lab07___show for weather and location and parks__________________________
+
+Estimate of time needed to complete: ___8__
 
 Start time: __2___
 
-Finish time: __6___
+Finish time: __10___
 
-Actual time needed to complete: __4__
+Actual time needed to complete: ____
