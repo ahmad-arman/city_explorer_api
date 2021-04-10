@@ -16,7 +16,9 @@ server.use(cors());
 const pg = require('pg');
 
 // const client = new pg.Client(process.env.DATABASE_URL);
-const client = new pg.Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+const client = new pg.Client({ connectionString: process.env.DATABASE_URL,
+  // ssl: { rejectUnauthorized: false }
+});
 
 server.get('/', testHander);
 server.get('/location', locationHander);
@@ -33,40 +35,49 @@ function locationHander(req, res) {
 
   let key = process.env.LOCATION_KEY;
   let cityName = req.query.city;
-  // console.log(req.query);
+
+
   // console.log(cityName);
-  let LocalURL = `https://eu1.locationiq.com/v1/search.php?key=${key}&q=${cityName}&format=json `;
+
+  let LocationURL = `https://eu1.locationiq.com/v1/search.php?key=${key}&q=${cityName}&format=json `;
 
   superagent
-    .get(LocalURL) //send request to LocationIQ API
+    .get(LocationURL) //send request to get the LocationIQ API and get data
+
     .then((getData) => {
+
       console.log('inside superagent');
+
       let infoData = getData.body;
+
       const myLocationData = new Location(cityName, infoData);
+
       let SQL = 'SELECT * FROM locations WHERE search_query=$1';
       let cityValue = [cityName];
-      client.query(SQL, cityValue).then((result) => {
+      console.log('city Name : ', cityName );
+
+      client.query(SQL, cityValue)
+        .then((result) => {
         // console.log(result);
-        if (result.rowCount) {
-          res.send(result.rows[0]);
-        } else {
-          let search_query = myLocationData.search_query;
-          let formatted_query = myLocationData.formatted_query;
-          let lat = myLocationData.latitude;
-          let lon = myLocationData.longitude;
-          SQL =
-            'INSERT INTO locations (search_query,formatted_query,latitude,longitude) VALUES ($1,$2,$3,$4) RETURNING *;';
-          let safeValues = [search_query, formatted_query, lat, lon];
-          client.query(SQL, safeValues).then((result) => {
+          if (result.rowCount) {
             res.send(result.rows[0]);
-          });
-        }
-      });
-      // }
-      // res.send(locationData);
+          } else {
+            let search_query = myLocationData.search_query;
+            let formatted_query = myLocationData.formatted_query;
+            let lat = myLocationData.latitude;
+            let lon = myLocationData.longitude;
+            SQL ='INSERT INTO locations (search_query,formatted_query,latitude,longitude) VALUES ($1,$2,$3,$4) RETURNING *;';
+            let safeValues = [search_query, formatted_query, lat, lon];
+            client.query(SQL, safeValues)
+              .then((result) => {
+                res.send(result.rows[0]);
+              });
+          }
+        });
+
     })
     .catch((error) => {
-      console.log('Error in getting data from LocationIQ server');
+      console.log('Error in the data from Location server');
       console.error(error);
       res.send(error);
     });
@@ -132,11 +143,15 @@ function errorHander(req, res) {
   }
 }
 
+
+
+client.connect().then(() => {
+  server.listen(PORT, () =>{
+    console.log(`listening on ${PORT}`);
+  } );
+});
+
 // server.listen(PORT, () => {
 //   console.log(`listening on port ${PORT}`);
 //   console.log('ahmad');
 // });
-
-client.connect().then(() => {
-  server.listen(PORT, () => console.log(`listening on ${PORT}`));
-});
